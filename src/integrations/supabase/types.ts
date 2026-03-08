@@ -52,6 +52,36 @@ export type Database = {
           },
         ]
       }
+      asha_workers: {
+        Row: {
+          area: string
+          created_at: string
+          id: string
+          name: string
+          phone: string
+          status: string
+          village_name: string
+        }
+        Insert: {
+          area?: string
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string
+          status?: string
+          village_name: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string
+          status?: string
+          village_name?: string
+        }
+        Relationships: []
+      }
       forecasts: {
         Row: {
           confidence: number
@@ -157,6 +187,30 @@ export type Database = {
           squad_name?: string
           status?: string
           villages?: string[]
+        }
+        Relationships: []
+      }
+      villages: {
+        Row: {
+          created_at: string
+          district: string
+          id: string
+          name: string
+          taluk: string
+        }
+        Insert: {
+          created_at?: string
+          district?: string
+          id?: string
+          name: string
+          taluk?: string
+        }
+        Update: {
+          created_at?: string
+          district?: string
+          id?: string
+          name?: string
+          taluk?: string
         }
         Relationships: []
       }
