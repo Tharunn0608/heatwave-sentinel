@@ -194,7 +194,72 @@ export default function ReportPage() {
             {listening && <p className="text-xs text-destructive mt-1.5 animate-pulse font-semibold">🎙️ Listening (Kannada/English)...</p>}
           </div>
 
-          {/* Sensors */}
+          {/* Photo Capture */}
+          <div>
+            <label className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2.5">
+              <Camera className="w-4 h-4 text-primary" /> Photo Evidence
+            </label>
+
+            {showCamera ? (
+              <div className="relative rounded-xl overflow-hidden border border-border/60 bg-black">
+                <video ref={videoRef} autoPlay playsInline muted className="w-full aspect-video object-cover" />
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={capturePhoto}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-14 h-14 rounded-full bg-white border-4 border-primary shadow-lg flex items-center justify-center"
+                  >
+                    <Camera className="w-6 h-6 text-primary" />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={closeCamera}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-10 h-10 rounded-full bg-destructive/90 text-white flex items-center justify-center self-center"
+                  >
+                    <X className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </div>
+            ) : photo ? (
+              <div className="relative rounded-xl overflow-hidden border border-border/60">
+                <img src={photo} alt="Captured" className="w-full aspect-video object-cover" />
+                <motion.button
+                  type="button"
+                  onClick={() => setPhoto(null)}
+                  whileTap={{ scale: 0.9 }}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-destructive/90 text-white flex items-center justify-center shadow-md"
+                >
+                  <X className="w-4 h-4" />
+                </motion.button>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <motion.button
+                  type="button"
+                  onClick={openCamera}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 text-primary font-semibold text-sm flex items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/10 transition-all"
+                >
+                  <Camera className="w-4 h-4" /> Open Camera
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-3 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 text-muted-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:border-border hover:bg-muted/50 transition-all"
+                >
+                  <Image className="w-4 h-4" /> Upload Photo
+                </motion.button>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+              </div>
+            )}
+          </div>
+
+
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: 'Temp (°C)', icon: Thermometer, key: 'temp' },
