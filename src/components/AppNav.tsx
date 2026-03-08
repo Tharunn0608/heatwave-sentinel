@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { path: '/ar-patrol', label: 'AR Patrol', icon: Camera },
   { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
   { path: '/admin', label: 'Admin', icon: Shield },
+  { path: '/about', label: 'About', icon: Zap },
 ];
 
 function useDarkMode() {
