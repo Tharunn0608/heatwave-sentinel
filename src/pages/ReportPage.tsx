@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Thermometer, Droplets, CloudRain, Clock, Send, Mic, MicOff, CheckCircle, Loader2 } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, CloudRain, Clock, Send, Mic, MicOff, CheckCircle, Loader2, Camera, X, Image } from 'lucide-react';
 import RiskGauge from '@/components/RiskGauge';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import { predictRisk, useInsertHotspot } from '@/hooks/useHotspots';
