@@ -7,31 +7,65 @@ interface StatsCardProps {
   subtitle?: string;
   icon: LucideIcon;
   variant?: 'default' | 'danger' | 'warning' | 'success';
+  delay?: number;
 }
 
-const variantClasses = {
-  default: 'bg-card border',
-  danger: 'gradient-danger text-primary-foreground',
-  warning: 'gradient-warning',
-  success: 'gradient-primary text-primary-foreground',
+const variantStyles = {
+  default: {
+    card: 'bg-card border border-border/60',
+    icon: 'bg-muted text-muted-foreground',
+    text: '',
+    value: '',
+  },
+  danger: {
+    card: 'gradient-danger glow-danger',
+    icon: 'bg-primary-foreground/20 text-primary-foreground',
+    text: 'text-primary-foreground',
+    value: 'text-primary-foreground',
+  },
+  warning: {
+    card: 'gradient-warning glow-warning',
+    icon: 'bg-primary-foreground/20 text-foreground',
+    text: 'text-foreground',
+    value: 'text-foreground',
+  },
+  success: {
+    card: 'gradient-primary glow',
+    icon: 'bg-primary-foreground/20 text-primary-foreground',
+    text: 'text-primary-foreground',
+    value: 'text-primary-foreground',
+  },
 };
 
-export default function StatsCard({ title, value, subtitle, icon: Icon, variant = 'default' }: StatsCardProps) {
+export default function StatsCard({ title, value, subtitle, icon: Icon, variant = 'default', delay = 0 }: StatsCardProps) {
+  const s = variantStyles[variant];
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`rounded-xl p-5 shadow-card ${variantClasses[variant]}`}
+      initial={{ opacity: 0, y: 24, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay, type: 'spring', stiffness: 260, damping: 20 }}
+      whileHover={{ y: -4, scale: 1.02 }}
+      className={`rounded-2xl p-5 shadow-card cursor-default transition-shadow hover:shadow-elevated ${s.card}`}
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className={`text-sm font-medium ${variant === 'default' ? 'text-muted-foreground' : 'opacity-80'}`}>{title}</p>
-          <p className="text-3xl font-bold mt-1">{value}</p>
-          {subtitle && <p className={`text-xs mt-1 ${variant === 'default' ? 'text-muted-foreground' : 'opacity-70'}`}>{subtitle}</p>}
+          <p className={`text-xs font-semibold uppercase tracking-wider ${variant === 'default' ? 'text-muted-foreground' : 'opacity-80'} ${s.text}`}>{title}</p>
+          <motion.p 
+            className={`text-3xl font-extrabold mt-1.5 tracking-tight ${s.value}`}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: delay + 0.2, type: 'spring' }}
+          >
+            {value}
+          </motion.p>
+          {subtitle && <p className={`text-xs mt-1 ${variant === 'default' ? 'text-muted-foreground' : 'opacity-70'} ${s.text}`}>{subtitle}</p>}
         </div>
-        <div className={`p-2 rounded-lg ${variant === 'default' ? 'bg-muted' : 'bg-primary-foreground/20'}`}>
+        <motion.div 
+          whileHover={{ rotate: 12 }}
+          className={`p-2.5 rounded-xl ${s.icon}`}
+        >
           <Icon className="w-5 h-5" />
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );

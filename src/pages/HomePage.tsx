@@ -1,93 +1,154 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, AlertTriangle, Activity, Plus } from 'lucide-react';
+import { MapPin, AlertTriangle, Activity, Plus, Zap, TrendingUp } from 'lucide-react';
 import HeatMap from '@/components/HeatMap';
 import StatsCard from '@/components/StatsCard';
 import RiskGauge from '@/components/RiskGauge';
-import { VILLAGES, type Hotspot, getRiskLabel } from '@/utils/mockData';
+import AnimatedBackground from '@/components/AnimatedBackground';
+import { useHotspots, type Hotspot, getRiskLabel } from '@/hooks/useHotspots';
 import { Link } from 'react-router-dom';
 
+const container = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 20 } },
+};
+
 export default function HomePage() {
+  const { data: hotspots = [], isLoading } = useHotspots();
   const [selected, setSelected] = useState<Hotspot | null>(null);
-  const high = VILLAGES.filter(v => v.risk_score >= 0.7).length;
-  const active = VILLAGES.filter(v => v.status === 'active').length;
+  const high = hotspots.filter(v => v.risk_score >= 0.7).length;
+  const active = hotspots.filter(v => v.status === 'active').length;
+  const avgRisk = hotspots.length > 0 
+    ? (hotspots.reduce((a, v) => a + v.risk_score, 0) / hotspots.length * 100).toFixed(0) 
+    : '0';
 
   return (
-    <div className="pt-16 pb-20 md:pb-4">
-      <div className="container py-6 space-y-6">
+    <div className="pt-18 pb-24 md:pb-6 min-h-screen">
+      <AnimatedBackground />
+      <div className="container py-8 space-y-8">
         {/* Hero */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-2"
+          transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+          className="text-center space-y-4 py-4"
         >
-          <h1 className="text-3xl md:text-4xl font-bold">
-            <span className="text-gradient">HeatWave Vector</span> Predictor
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20"
+          >
+            <Zap className="w-3.5 h-3.5" />
+            AI-Powered Risk Analysis
+          </motion.div>
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
+            <span className="text-gradient">HeatWave</span>{' '}
+            <span className="text-foreground">Predictor</span>
           </h1>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            AI-powered heatwave risk prediction for Karnataka. Report hotspots, track risks, protect communities.
+          <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg leading-relaxed">
+            Real-time heatwave risk prediction for Karnataka. Report hotspots, track risks, protect communities.
           </p>
         </motion.div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <StatsCard title="Total Hotspots" value={VILLAGES.length} icon={MapPin} />
-          <StatsCard title="High Risk" value={high} icon={AlertTriangle} variant="danger" />
-          <StatsCard title="Active" value={active} icon={Activity} variant="warning" />
-          <StatsCard title="Avg Risk" value={`${(VILLAGES.reduce((a, v) => a + v.risk_score, 0) / VILLAGES.length * 100).toFixed(0)}%`} icon={Activity} variant="success" />
-        </div>
+        <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <motion.div variants={item}><StatsCard title="Total Hotspots" value={hotspots.length} icon={MapPin} delay={0} /></motion.div>
+          <motion.div variants={item}><StatsCard title="High Risk" value={high} icon={AlertTriangle} variant="danger" delay={0.1} /></motion.div>
+          <motion.div variants={item}><StatsCard title="Active" value={active} icon={Activity} variant="warning" delay={0.2} /></motion.div>
+          <motion.div variants={item}><StatsCard title="Avg Risk" value={`${avgRisk}%`} icon={TrendingUp} variant="success" delay={0.3} /></motion.div>
+        </motion.div>
 
         {/* Map + Detail */}
-        <div className="grid md:grid-cols-3 gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid md:grid-cols-3 gap-6"
+        >
           <div className="md:col-span-2">
-            <HeatMap onSelectHotspot={setSelected} className="h-[450px]" />
+            {isLoading ? (
+              <div className="h-[450px] rounded-2xl bg-muted animate-pulse flex items-center justify-center">
+                <div className="text-muted-foreground text-sm">Loading map data...</div>
+              </div>
+            ) : (
+              <HeatMap hotspots={hotspots} onSelectHotspot={setSelected} className="h-[480px]" />
+            )}
           </div>
           <div className="space-y-4">
             {selected ? (
               <motion.div
                 key={selected.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="bg-card border rounded-xl p-5 shadow-card space-y-4"
+                initial={{ opacity: 0, x: 24, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className="bg-card border border-border/60 rounded-2xl p-6 shadow-elevated space-y-5"
               >
-                <h2 className="font-bold text-lg">{selected.village_name}</h2>
-                <RiskGauge score={selected.risk_score} size={140} />
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">Temperature</p>
-                    <p className="font-bold">{selected.temp}°C</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">Humidity</p>
-                    <p className="font-bold">{selected.humidity}%</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">Rain (24h)</p>
-                    <p className="font-bold">{selected.rain_mm}mm</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-muted-foreground text-xs">Stagnation</p>
-                    <p className="font-bold">{selected.water_stagnation_days}d</p>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <h2 className="font-bold text-xl tracking-tight">{selected.village_name}</h2>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    selected.status === 'active' ? 'bg-destructive/10 text-destructive' :
+                    selected.status === 'monitoring' ? 'bg-warning/10 text-warning' :
+                    'bg-accent text-accent-foreground'
+                  }`}>
+                    {selected.status}
+                  </span>
                 </div>
-                <p className="text-xs text-muted-foreground">Status: <span className="capitalize font-medium text-foreground">{selected.status}</span></p>
+                <RiskGauge score={selected.risk_score} size={150} />
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {[
+                    { label: 'Temperature', value: `${selected.temp}°C`, icon: '🌡️' },
+                    { label: 'Humidity', value: `${selected.humidity}%`, icon: '💧' },
+                    { label: 'Rain (24h)', value: `${selected.rain_mm}mm`, icon: '🌧️' },
+                    { label: 'Stagnation', value: `${selected.water_stagnation_days}d`, icon: '🏊' },
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={item.label}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + i * 0.05 }}
+                      className="bg-muted/50 rounded-xl p-3 border border-border/30"
+                    >
+                      <p className="text-muted-foreground text-xs flex items-center gap-1">{item.icon} {item.label}</p>
+                      <p className="font-bold text-lg mt-0.5">{item.value}</p>
+                    </motion.div>
+                  ))}
+                </div>
               </motion.div>
             ) : (
-              <div className="bg-card border rounded-xl p-8 shadow-card text-center text-muted-foreground">
-                <MapPin className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">Click a marker on the map to view details</p>
-              </div>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="bg-card border border-border/60 rounded-2xl p-10 shadow-card text-center"
+              >
+                <motion.div
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <MapPin className="w-10 h-10 mx-auto mb-3 text-muted-foreground/30" />
+                </motion.div>
+                <p className="text-sm text-muted-foreground font-medium">Click a marker on the map to view details</p>
+              </motion.div>
             )}
 
-            <Link
-              to="/report"
-              className="flex items-center justify-center gap-2 w-full py-3 rounded-xl gradient-primary text-primary-foreground font-semibold shadow-card glow transition-transform hover:scale-[1.02]"
+            <motion.div
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Plus className="w-4 h-4" />
-              Report New Hotspot
-            </Link>
+              <Link
+                to="/report"
+                className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl gradient-primary text-primary-foreground font-bold text-base shadow-elevated glow transition-all"
+              >
+                <Plus className="w-5 h-5" />
+                Report New Hotspot
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
