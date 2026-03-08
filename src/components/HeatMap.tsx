@@ -1,14 +1,16 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { TUMKUR_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
+import { type Hotspot, getRiskColor, getRiskLabel } from '@/hooks/useHotspots';
+import { TUMKUR_CENTER } from '@/utils/mockData';
 
 interface HeatMapProps {
+  hotspots: Hotspot[];
   onSelectHotspot?: (h: Hotspot) => void;
   className?: string;
 }
 
-export default function HeatMap({ onSelectHotspot, className = '' }: HeatMapProps) {
+export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: HeatMapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
 
@@ -24,31 +26,9 @@ export default function HeatMap({ onSelectHotspot, className = '' }: HeatMapProp
 
     leafletMapRef.current = map;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     }).addTo(map);
-
-    VILLAGES.forEach((v) => {
-      const color = getRiskColor(v.risk_score);
-      const marker = L.circleMarker([v.lat, v.lng], {
-        radius: 12 + v.risk_score * 12,
-        color,
-        fillColor: color,
-        fillOpacity: 0.6,
-        weight: 2,
-      }).addTo(map);
-
-      marker.bindPopup(`
-        <div style="padding: 2px 4px; font-family: Inter, sans-serif;">
-          <h3 style="margin: 0 0 4px; font-size: 13px; font-weight: 700;">${v.village_name}</h3>
-          <p style="margin: 0; font-size: 12px;">Risk: <strong>${(v.risk_score * 100).toFixed(0)}%</strong> — ${getRiskLabel(v.risk_score)}</p>
-          <p style="margin: 0; font-size: 12px;">Temp: ${v.temp}°C | Humidity: ${v.humidity}%</p>
-          <p style="margin: 0; font-size: 12px;">Status: ${v.status}</p>
-        </div>
-      `);
-
-      marker.on('click', () => onSelectHotspot?.(v));
-    });
 
     setTimeout(() => map.invalidateSize(), 100);
 
@@ -56,10 +36,46 @@ export default function HeatMap({ onSelectHotspot, className = '' }: HeatMapProp
       map.remove();
       leafletMapRef.current = null;
     };
-  }, [onSelectHotspot]);
+  }, []);
+
+  // Update markers when hotspots change
+  useEffect(() => {
+    const map = leafletMapRef.current;
+    if (!map) return;
+
+    // Clear existing markers
+    map.eachLayer((layer) => {
+      if (layer instanceof L.CircleMarker) map.removeLayer(layer);
+    });
+
+    hotspots.forEach((v) => {
+      const color = getRiskColor(v.risk_score);
+      const marker = L.circleMarker([v.lat, v.lng], {
+        radius: 10 + v.risk_score * 14,
+        color,
+        fillColor: color,
+        fillOpacity: 0.5,
+        weight: 2.5,
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="padding: 4px 8px; font-family: 'Space Grotesk', Inter, sans-serif; min-width: 160px;">
+          <h3 style="margin: 0 0 6px; font-size: 14px; font-weight: 700; color: #1a1a2e;">${v.village_name}</h3>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${color};"></span>
+            <span style="font-size: 13px; font-weight: 600;">${(v.risk_score * 100).toFixed(0)}%</span>
+            <span style="font-size: 11px; color: #666;">— ${getRiskLabel(v.risk_score)}</span>
+          </div>
+          <p style="margin: 0; font-size: 11px; color: #888;">${v.temp}°C · ${v.humidity}% humidity · ${v.status}</p>
+        </div>
+      `);
+
+      marker.on('click', () => onSelectHotspot?.(v));
+    });
+  }, [hotspots, onSelectHotspot]);
 
   return (
-    <div className={`rounded-lg overflow-hidden border shadow-card ${className}`}>
+    <div className={`rounded-2xl overflow-hidden border border-border/60 shadow-elevated ${className}`}>
       <div ref={mapRef} style={{ height: '100%', minHeight: 400 }} />
     </div>
   );

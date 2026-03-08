@@ -1,30 +1,41 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Thermometer, Droplets, CloudRain, Clock, Send, Mic, MicOff, CheckCircle } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, CloudRain, Clock, Send, Mic, MicOff, CheckCircle, Loader2 } from 'lucide-react';
 import RiskGauge from '@/components/RiskGauge';
-import { predictRisk, getRiskLabel } from '@/utils/mockData';
+import AnimatedBackground from '@/components/AnimatedBackground';
+import { predictRisk, useInsertHotspot } from '@/hooks/useHotspots';
+import { toast } from 'sonner';
 
 export default function ReportPage() {
   const [form, setForm] = useState({ lat: '13.3429', lng: '77.1029', temp: '36', humidity: '70', rain: '4', stagnation: '3', village: '' });
   const [prediction, setPrediction] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handlePredict = () => {
-    const score = predictRisk(+form.temp, +form.humidity, +form.rain, +form.stagnation);
-    setPrediction(score);
-  };
+  const insertHotspot = useInsertHotspot();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handlePredict();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
+    const score = predictRisk(+form.temp, +form.humidity, +form.rain, +form.stagnation);
+    setPrediction(score);
+
+    insertHotspot.mutate({
+      lat: +form.lat,
+      lng: +form.lng,
+      temp: +form.temp,
+      humidity: +form.humidity,
+      rain_mm: +form.rain,
+      water_stagnation_days: +form.stagnation,
+      risk_score: score,
+      village_name: form.village || 'Unknown Village',
+      status: score >= 0.7 ? 'active' : score >= 0.3 ? 'monitoring' : 'resolved',
+    }, {
+      onSuccess: () => toast.success('Hotspot reported and saved to database!'),
+      onError: () => toast.error('Failed to save. You may need to log in.'),
+    });
   };
 
   const toggleVoice = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Speech recognition not supported in this browser');
+      toast.error('Speech recognition not supported');
       return;
     }
     setListening(!listening);
@@ -34,101 +45,120 @@ export default function ReportPage() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((pos) => {
         setForm(f => ({ ...f, lat: pos.coords.latitude.toFixed(4), lng: pos.coords.longitude.toFixed(4) }));
+        toast.success('GPS location detected!');
       });
     }
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow";
+  const inputClass = "w-full px-4 py-3.5 rounded-xl bg-muted/50 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm font-medium";
 
   return (
-    <div className="pt-16 pb-20 md:pb-4">
-      <div className="container max-w-lg py-6 space-y-6">
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Report Hotspot</h1>
+    <div className="pt-18 pb-24 md:pb-6 min-h-screen">
+      <AnimatedBackground />
+      <div className="container max-w-lg py-8 space-y-8">
+        <motion.div 
+          initial={{ opacity: 0, y: -24 }} 
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring' }}
+          className="text-center space-y-3"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20">
+            <MapPin className="w-3.5 h-3.5" />
+            Field Report
+          </div>
+          <h1 className="text-3xl font-extrabold tracking-tight">Report Hotspot</h1>
           <p className="text-sm text-muted-foreground">Submit environmental data for AI risk prediction</p>
         </motion.div>
 
         <motion.form
           onSubmit={handleSubmit}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-card border rounded-xl p-6 shadow-card space-y-4"
+          transition={{ delay: 0.1, type: 'spring' }}
+          className="bg-card border border-border/60 rounded-2xl p-7 shadow-elevated space-y-5"
         >
           {/* Location */}
           <div>
-            <label className="text-sm font-medium text-muted-foreground flex items-center gap-2 mb-2">
-              <MapPin className="w-4 h-4" /> Location
+            <label className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2.5">
+              <MapPin className="w-4 h-4 text-primary" /> Location
             </label>
             <div className="grid grid-cols-2 gap-3">
               <input type="number" step="0.0001" placeholder="Latitude" value={form.lat} onChange={e => setForm(f => ({ ...f, lat: e.target.value }))} className={inputClass} />
               <input type="number" step="0.0001" placeholder="Longitude" value={form.lng} onChange={e => setForm(f => ({ ...f, lng: e.target.value }))} className={inputClass} />
             </div>
-            <button type="button" onClick={handleGPS} className="mt-2 text-xs text-primary font-medium hover:underline flex items-center gap-1">
+            <motion.button 
+              type="button" 
+              onClick={handleGPS} 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="mt-2.5 text-xs text-primary font-bold hover:underline flex items-center gap-1.5 px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors"
+            >
               <MapPin className="w-3 h-3" /> Auto-detect GPS
-            </button>
+            </motion.button>
           </div>
 
           {/* Village */}
           <div>
-            <label className="text-sm font-medium text-muted-foreground mb-2 block">Village Name</label>
+            <label className="text-sm font-semibold text-foreground mb-2.5 block">Village Name</label>
             <div className="relative">
               <input placeholder="Enter village name" value={form.village} onChange={e => setForm(f => ({ ...f, village: e.target.value }))} className={inputClass} />
-              <button type="button" onClick={toggleVoice} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={toggleVoice} className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
                 {listening ? <Mic className="w-4 h-4 text-destructive animate-pulse" /> : <MicOff className="w-4 h-4" />}
               </button>
             </div>
-            {listening && <p className="text-xs text-destructive mt-1 animate-pulse">🎙️ Listening (Kannada/English)...</p>}
+            {listening && <p className="text-xs text-destructive mt-1.5 animate-pulse font-semibold">🎙️ Listening (Kannada/English)...</p>}
           </div>
 
           {/* Sensors */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1"><Thermometer className="w-3 h-3" /> Temp (°C)</label>
-              <input type="number" value={form.temp} onChange={e => setForm(f => ({ ...f, temp: e.target.value }))} className={inputClass} />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1"><Droplets className="w-3 h-3" /> Humidity (%)</label>
-              <input type="number" value={form.humidity} onChange={e => setForm(f => ({ ...f, humidity: e.target.value }))} className={inputClass} />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1"><CloudRain className="w-3 h-3" /> Rain 24h (mm)</label>
-              <input type="number" value={form.rain} onChange={e => setForm(f => ({ ...f, rain: e.target.value }))} className={inputClass} />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground flex items-center gap-1 mb-1"><Clock className="w-3 h-3" /> Stagnation (days)</label>
-              <input type="number" value={form.stagnation} onChange={e => setForm(f => ({ ...f, stagnation: e.target.value }))} className={inputClass} />
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: 'Temp (°C)', icon: Thermometer, key: 'temp' },
+              { label: 'Humidity (%)', icon: Droplets, key: 'humidity' },
+              { label: 'Rain 24h (mm)', icon: CloudRain, key: 'rain' },
+              { label: 'Stagnation (days)', icon: Clock, key: 'stagnation' },
+            ].map(({ label, icon: Icon, key }) => (
+              <div key={key}>
+                <label className="text-xs text-muted-foreground flex items-center gap-1.5 mb-1.5 font-semibold">
+                  <Icon className="w-3.5 h-3.5 text-primary" /> {label}
+                </label>
+                <input 
+                  type="number" 
+                  value={form[key as keyof typeof form]} 
+                  onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} 
+                  className={inputClass} 
+                />
+              </div>
+            ))}
           </div>
 
           {/* Submit */}
-          <button
+          <motion.button
             type="submit"
-            className="w-full py-3 rounded-xl gradient-primary text-primary-foreground font-semibold flex items-center justify-center gap-2 glow transition-transform hover:scale-[1.02]"
+            disabled={insertHotspot.isPending}
+            whileHover={{ scale: 1.01, y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-4 rounded-xl gradient-primary text-primary-foreground font-bold flex items-center justify-center gap-2.5 glow transition-all disabled:opacity-70 text-base"
           >
-            <Send className="w-4 h-4" />
-            Submit & Predict
-          </button>
-
-          {submitted && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 justify-center text-sm text-primary font-medium">
-              <CheckCircle className="w-4 h-4" /> Report submitted successfully!
-            </motion.div>
-          )}
+            {insertHotspot.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            {insertHotspot.isPending ? 'Saving...' : 'Submit & Predict'}
+          </motion.button>
         </motion.form>
 
         {/* Prediction Result */}
         {prediction !== null && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-card border rounded-xl p-6 shadow-card text-center space-y-3"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+            className="bg-card border border-border/60 rounded-2xl p-8 shadow-elevated text-center space-y-4"
           >
-            <h2 className="font-bold">AI Prediction Result</h2>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
+              <CheckCircle className="w-3 h-3" /> AI Analysis Complete
+            </div>
             <RiskGauge score={prediction} />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground font-medium max-w-xs mx-auto">
               {prediction >= 0.7
-                ? '⚠️ High risk zone! Alert sent to spray squad.'
+                ? '⚠️ High risk zone detected! Alert sent to spray squad.'
                 : prediction >= 0.3
                 ? '⚡ Medium risk. Monitoring recommended.'
                 : '✅ Low risk area. Keep monitoring.'}
