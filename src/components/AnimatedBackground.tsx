@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, forwardRef } from 'react';
 
 function FloatingParticle({ delay, size, x, y, color }: { delay: number; size: number; x: string; y: string; color: string }) {
   return (
