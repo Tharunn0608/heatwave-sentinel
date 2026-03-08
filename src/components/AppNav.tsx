@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
-import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap, Moon, Sun } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap, Moon, Sun, LogOut, LogIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Map', icon: MapPin },
