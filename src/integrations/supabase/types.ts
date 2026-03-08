@@ -14,7 +14,122 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          created_at: string
+          hotspot_id: string
+          id: string
+          risk_score: number
+          sent_to: string
+          status: string
+          village: string
+        }
+        Insert: {
+          created_at?: string
+          hotspot_id: string
+          id?: string
+          risk_score: number
+          sent_to: string
+          status?: string
+          village: string
+        }
+        Update: {
+          created_at?: string
+          hotspot_id?: string
+          id?: string
+          risk_score?: number
+          sent_to?: string
+          status?: string
+          village?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_hotspot_id_fkey"
+            columns: ["hotspot_id"]
+            isOneToOne: false
+            referencedRelation: "hotspots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forecasts: {
+        Row: {
+          confidence: number
+          created_at: string
+          date: string
+          district: string
+          id: string
+          risk_level: number
+        }
+        Insert: {
+          confidence: number
+          created_at?: string
+          date: string
+          district?: string
+          id?: string
+          risk_level: number
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          date?: string
+          district?: string
+          id?: string
+          risk_level?: number
+        }
+        Relationships: []
+      }
+      hotspots: {
+        Row: {
+          created_at: string
+          humidity: number
+          id: string
+          lat: number
+          lng: number
+          photo_url: string | null
+          rain_mm: number
+          reported_by: string | null
+          risk_score: number
+          status: string
+          temp: number
+          updated_at: string
+          village_name: string
+          water_stagnation_days: number
+        }
+        Insert: {
+          created_at?: string
+          humidity: number
+          id?: string
+          lat: number
+          lng: number
+          photo_url?: string | null
+          rain_mm?: number
+          reported_by?: string | null
+          risk_score?: number
+          status?: string
+          temp: number
+          updated_at?: string
+          village_name: string
+          water_stagnation_days?: number
+        }
+        Update: {
+          created_at?: string
+          humidity?: number
+          id?: string
+          lat?: number
+          lng?: number
+          photo_url?: string | null
+          rain_mm?: number
+          reported_by?: string | null
+          risk_score?: number
+          status?: string
+          temp?: number
+          updated_at?: string
+          village_name?: string
+          water_stagnation_days?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
