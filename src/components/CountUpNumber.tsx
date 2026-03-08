@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, forwardRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 interface CountUpNumberProps {
@@ -7,6 +7,8 @@ interface CountUpNumberProps {
   suffix?: string;
   className?: string;
 }
+
+const CountUpNumber = forwardRef<HTMLSpanElement, CountUpNumberProps>(({ end, duration = 1.5, suffix = '', className = '' }, _ref) => {
 
 export default function CountUpNumber({ end, duration = 1.5, suffix = '', className = '' }: CountUpNumberProps) {
   const ref = useRef<HTMLSpanElement>(null);
