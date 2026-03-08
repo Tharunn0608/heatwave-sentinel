@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AIChatWidget from "@/components/AIChatWidget";
 import AlertTicker from "@/components/AlertTicker";
 import RealtimeProvider from "@/components/RealtimeProvider";
+import CursorGlow from "@/components/CursorGlow";
 import HomePage from "./pages/HomePage";
 import ReportPage from "./pages/ReportPage";
 import ARPatrolPage from "./pages/ARPatrolPage";
@@ -19,6 +20,7 @@ import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import AboutPage from "./pages/AboutPage";
 import InstallPage from "./pages/InstallPage";
+import RiskTimelinePage from "./pages/RiskTimelinePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,7 @@ const App = () => (
         <Sonner />
         <AuthProvider>
           <BrowserRouter>
+            <CursorGlow />
             <RealtimeProvider />
             <OfflineIndicator />
             <AppNav />
@@ -42,6 +45,7 @@ const App = () => (
               <Route path="/ar-patrol" element={<ProtectedRoute><ARPatrolPage /></ProtectedRoute>} />
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+              <Route path="/timeline" element={<RiskTimelinePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/install" element={<InstallPage />} />
               <Route path="*" element={<NotFound />} />

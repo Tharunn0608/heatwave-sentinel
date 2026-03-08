@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, AlertTriangle, Activity, Plus, Zap, TrendingUp } from 'lucide-react';
+import { MapPin, AlertTriangle, Activity, Plus, Zap, TrendingUp, Sparkles } from 'lucide-react';
 import HeatMap from '@/components/HeatMap';
 import StatsCard from '@/components/StatsCard';
 import RiskGauge from '@/components/RiskGauge';
+import RiskPulseOrb from '@/components/RiskPulseOrb';
+import TypewriterText from '@/components/TypewriterText';
+import CountUpNumber from '@/components/CountUpNumber';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import { useHotspots, type Hotspot, getRiskLabel } from '@/hooks/useHotspots';
 import { Link } from 'react-router-dom';
@@ -23,8 +26,8 @@ export default function HomePage() {
   const high = hotspots.filter(v => v.risk_score >= 0.7).length;
   const active = hotspots.filter(v => v.status === 'active').length;
   const avgRisk = hotspots.length > 0 
-    ? (hotspots.reduce((a, v) => a + v.risk_score, 0) / hotspots.length * 100).toFixed(0) 
-    : '0';
+    ? +(hotspots.reduce((a, v) => a + v.risk_score, 0) / hotspots.length).toFixed(2)
+    : 0;
 
   return (
     <div className="pt-20 pb-24 md:pb-6 min-h-screen">
@@ -35,7 +38,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="text-center space-y-4 py-4"
+          className="text-center space-y-5 py-6"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -43,24 +46,47 @@ export default function HomePage() {
             transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20"
           >
-            <Zap className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Risk Analysis
           </motion.div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight">
-            <span className="text-gradient">HeatWave</span>{' '}
+            <TypewriterText 
+              words={['HeatWave', 'SmartRisk', 'SafeZone', 'PredictAI']}
+              className="min-w-[200px]"
+            />{' '}
             <span className="text-foreground">Predictor</span>
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto text-base md:text-lg leading-relaxed">
             Real-time heatwave risk prediction for Karnataka. Report hotspots, track risks, protect communities.
           </p>
+          
+          {/* Floating Risk Orb */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, type: 'spring' }}
+            className="flex justify-center pt-2"
+          >
+            <div className="relative">
+              <RiskPulseOrb riskScore={avgRisk} size={160} />
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+                className="text-xs text-muted-foreground font-semibold mt-2 text-center"
+              >
+                District Avg Risk
+              </motion.p>
+            </div>
+          </motion.div>
         </motion.div>
 
-        {/* Stats */}
+        {/* Stats with CountUp */}
         <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <motion.div variants={item}><StatsCard title="Total Hotspots" value={hotspots.length} icon={MapPin} delay={0} /></motion.div>
           <motion.div variants={item}><StatsCard title="High Risk" value={high} icon={AlertTriangle} variant="danger" delay={0.1} /></motion.div>
           <motion.div variants={item}><StatsCard title="Active" value={active} icon={Activity} variant="warning" delay={0.2} /></motion.div>
-          <motion.div variants={item}><StatsCard title="Avg Risk" value={`${avgRisk}%`} icon={TrendingUp} variant="success" delay={0.3} /></motion.div>
+          <motion.div variants={item}><StatsCard title="Avg Risk" value={`${(avgRisk * 100).toFixed(0)}%`} icon={TrendingUp} variant="success" delay={0.3} /></motion.div>
         </motion.div>
 
         {/* Map + Detail */}
@@ -145,6 +171,19 @@ export default function HomePage() {
               >
                 <Plus className="w-5 h-5" />
                 Report New Hotspot
+              </Link>
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Link
+                to="/timeline"
+                className="flex items-center justify-center gap-2.5 w-full py-4 rounded-2xl bg-card border border-border/60 text-foreground font-bold text-base shadow-card hover:shadow-elevated transition-all"
+              >
+                <Sparkles className="w-5 h-5 text-primary" />
+                View Risk Timeline
               </Link>
             </motion.div>
           </div>
