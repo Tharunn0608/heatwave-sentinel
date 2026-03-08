@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import { TUMKUR_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
+import { HASSAN_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
 import 'leaflet/dist/leaflet.css';
 import { useEffect } from 'react';
 
