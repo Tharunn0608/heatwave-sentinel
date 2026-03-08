@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
-import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap, Moon, Sun } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap, Moon, Sun, LogOut, LogIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Map', icon: MapPin },
@@ -35,8 +36,19 @@ function useDarkMode() {
 
 export default function AppNav() {
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [dark, toggleDark] = useDarkMode();
+
+  const handleAuth = async () => {
+    if (user) {
+      await signOut();
+      navigate('/auth');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <>
@@ -84,6 +96,16 @@ export default function AppNav() {
 
           {/* Right side: dark mode + mobile toggle */}
           <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={handleAuth}
+              className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label={user ? 'Sign out' : 'Sign in'}
+              title={user ? 'Sign out' : 'Sign in'}
+            >
+              {user ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+            </motion.button>
+
             <motion.button
               whileTap={{ scale: 0.85, rotate: 180 }}
               onClick={toggleDark}
