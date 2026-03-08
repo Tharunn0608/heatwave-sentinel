@@ -43,6 +43,7 @@ const App = () => (
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/install" element={<InstallPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <AIChatWidget />
