@@ -93,7 +93,7 @@ export default function ReportPage() {
   const inputClass = "w-full px-4 py-3.5 rounded-xl bg-muted/50 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm font-medium";
 
   return (
-    <div className="pt-18 pb-24 md:pb-6 min-h-screen">
+    <div className="pt-20 pb-24 md:pb-6 min-h-screen">
       <AnimatedBackground />
       <div className="container max-w-lg py-8 space-y-8">
         <motion.div 

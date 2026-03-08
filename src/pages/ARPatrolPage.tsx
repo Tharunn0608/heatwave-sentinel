@@ -37,7 +37,7 @@ export default function ARPatrolPage() {
   const highRisk = hotspots.filter(v => v.risk_score >= 0.7);
 
   return (
-    <div className="pt-18 pb-24 md:pb-6 min-h-screen">
+    <div className="pt-20 pb-24 md:pb-6 min-h-screen">
       <AnimatedBackground />
       <div className="container max-w-2xl py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring' }}>
