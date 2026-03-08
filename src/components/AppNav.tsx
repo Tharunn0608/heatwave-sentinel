@@ -97,6 +97,16 @@ export default function AppNav() {
           {/* Right side: dark mode + mobile toggle */}
           <div className="flex items-center gap-2">
             <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={handleAuth}
+              className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label={user ? 'Sign out' : 'Sign in'}
+              title={user ? 'Sign out' : 'Sign in'}
+            >
+              {user ? <LogOut className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+            </motion.button>
+
+            <motion.button
               whileTap={{ scale: 0.85, rotate: 180 }}
               onClick={toggleDark}
               className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
