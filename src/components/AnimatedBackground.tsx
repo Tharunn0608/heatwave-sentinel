@@ -30,7 +30,7 @@ function FloatingParticle({ delay, size, x, y, color }: { delay: number; size: n
   );
 }
 
-export default function AnimatedBackground() {
+const AnimatedBackground = forwardRef<HTMLDivElement>(function AnimatedBackground(_props, ref) {
   const [particles] = useState(() =>
     Array.from({ length: 25 }, (_, i) => ({
       id: i,
