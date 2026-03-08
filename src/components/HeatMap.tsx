@@ -1,15 +1,7 @@
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import { TUMKUR_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
-import 'leaflet/dist/leaflet.css';
-import { useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
+import { type Hotspot } from '@/utils/mockData';
 
-function FitBounds() {
-  const map = useMap();
-  useEffect(() => {
-    map.invalidateSize();
-  }, [map]);
-  return null;
-}
+const LeafletMap = lazy(() => import('./LeafletMap'));
 
 interface HeatMapProps {
   onSelectHotspot?: (h: Hotspot) => void;
@@ -17,45 +9,50 @@ interface HeatMapProps {
 }
 
 export default function HeatMap({ onSelectHotspot, className = '' }: HeatMapProps) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return (
+      <div className={`rounded-lg overflow-hidden border shadow-card flex items-center justify-center bg-muted ${className}`} style={{ minHeight: 400 }}>
+        <p className="text-muted-foreground text-sm">Map failed to load. Try refreshing.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={`rounded-lg overflow-hidden border shadow-card ${className}`}>
-      <MapContainer
-        center={TUMKUR_CENTER}
-        zoom={10}
-        scrollWheelZoom={true}
-        style={{ height: '100%', minHeight: 400 }}
-      >
-        <FitBounds />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {VILLAGES.map((v) => (
-          <CircleMarker
-            key={v.id}
-            center={[v.lat, v.lng]}
-            radius={12 + v.risk_score * 12}
-            pathOptions={{
-              fillColor: getRiskColor(v.risk_score),
-              color: getRiskColor(v.risk_score),
-              fillOpacity: 0.6,
-              weight: 2,
-            }}
-            eventHandlers={{
-              click: () => onSelectHotspot?.(v),
-            }}
-          >
-            <Popup>
-              <div className="p-1">
-                <h3 className="font-bold text-sm">{v.village_name}</h3>
-                <p className="text-xs">Risk: <strong>{(v.risk_score * 100).toFixed(0)}%</strong> — {getRiskLabel(v.risk_score)}</p>
-                <p className="text-xs">Temp: {v.temp}°C | Humidity: {v.humidity}%</p>
-                <p className="text-xs">Status: {v.status}</p>
-              </div>
-            </Popup>
-          </CircleMarker>
-        ))}
-      </MapContainer>
+      <ErrorBoundary onError={() => setHasError(true)}>
+        <Suspense fallback={
+          <div className="flex items-center justify-center bg-muted animate-pulse" style={{ minHeight: 400 }}>
+            <p className="text-muted-foreground text-sm">Loading map...</p>
+          </div>
+        }>
+          <LeafletMap onSelectHotspot={onSelectHotspot} />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
+}
+
+// Simple error boundary
+import React from 'react';
+
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; onError: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
 }
