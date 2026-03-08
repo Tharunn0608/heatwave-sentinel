@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Thermometer, Droplets, CloudRain, Clock, Send, Mic, MicOff, CheckCircle, Loader2 } from 'lucide-react';
 import RiskGauge from '@/components/RiskGauge';
@@ -33,13 +33,53 @@ export default function ReportPage() {
     });
   };
 
-  const toggleVoice = () => {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      toast.error('Speech recognition not supported');
+  const recognitionRef = useRef<any>(null);
+
+  const toggleVoice = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('Speech recognition not supported in this browser');
       return;
     }
-    setListening(!listening);
-  };
+
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recognition.lang = 'kn-IN'; // Kannada primary, falls back to English
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => setListening(true);
+
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0].transcript)
+        .join('');
+      setForm(f => ({ ...f, village: transcript }));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech error:', event.error);
+      if (event.error === 'not-allowed') {
+        toast.error('Microphone access denied. Please allow microphone permission.');
+      } else {
+        toast.error(`Speech error: ${event.error}`);
+      }
+      setListening(false);
+    };
+
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
+  }, [listening]);
 
   const handleGPS = () => {
     if (navigator.geolocation) {
