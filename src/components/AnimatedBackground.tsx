@@ -144,4 +144,6 @@ const AnimatedBackground = forwardRef<HTMLDivElement>(function AnimatedBackgroun
       />
     </div>
   );
-}
+});
+
+export default AnimatedBackground;
