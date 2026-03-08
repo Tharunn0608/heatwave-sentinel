@@ -47,7 +47,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
-              <p className="text-sm text-muted-foreground font-medium">Tumkūr District Analytics</p>
+              <p className="text-sm text-muted-foreground font-medium">Hassan District Analytics</p>
             </div>
           </div>
         </motion.div>

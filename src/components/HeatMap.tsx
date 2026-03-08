@@ -24,7 +24,7 @@ export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: H
     if (!mapRef.current || leafletMapRef.current) return;
 
     const map = L.map(mapRef.current, {
-      center: TUMKUR_CENTER,
+      center: HASSAN_CENTER,
       zoom: 10,
       zoomControl: true,
       scrollWheelZoom: true,

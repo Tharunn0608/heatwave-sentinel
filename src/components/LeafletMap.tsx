@@ -18,7 +18,7 @@ interface LeafletMapProps {
 export default function LeafletMap({ onSelectHotspot }: LeafletMapProps) {
   return (
     <MapContainer
-      center={TUMKUR_CENTER}
+      center={HASSAN_CENTER}
       zoom={10}
       scrollWheelZoom={true}
       style={{ height: '100%', minHeight: 400 }}

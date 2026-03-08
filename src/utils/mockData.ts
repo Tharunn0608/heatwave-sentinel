@@ -79,7 +79,7 @@ export const MOCK_FORECASTS: Forecast[] = Array.from({ length: 7 }, (_, i) => {
     date: d.toISOString().split('T')[0],
     risk_level: +(0.4 + Math.random() * 0.5).toFixed(2),
     confidence: +(0.7 + Math.random() * 0.25).toFixed(2),
-    district: 'Tumkūr',
+    district: 'Hassan',
   };
 });
 

@@ -7,7 +7,7 @@ import { predictRisk, useInsertHotspot } from '@/hooks/useHotspots';
 import { toast } from 'sonner';
 
 export default function ReportPage() {
-  const [form, setForm] = useState({ lat: '13.3429', lng: '77.1029', temp: '36', humidity: '70', rain: '4', stagnation: '3', village: '' });
+  const [form, setForm] = useState({ lat: '13.0068', lng: '76.1004', temp: '36', humidity: '70', rain: '4', stagnation: '3', village: '' });
   const [prediction, setPrediction] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const insertHotspot = useInsertHotspot();
