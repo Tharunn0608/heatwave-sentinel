@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { type Hotspot, getRiskColor, getRiskLabel } from '@/hooks/useHotspots';
@@ -13,6 +13,12 @@ interface HeatMapProps {
 export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: HeatMapProps) {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
+  const callbackRef = useRef(onSelectHotspot);
+
+  // Keep callback ref up to date without re-rendering markers
+  useEffect(() => {
+    callbackRef.current = onSelectHotspot;
+  }, [onSelectHotspot]);
 
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return;
@@ -38,12 +44,12 @@ export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: H
     };
   }, []);
 
-  // Update markers when hotspots change
+  // Update markers when hotspots change (not when callback changes)
   useEffect(() => {
     const map = leafletMapRef.current;
-    if (!map) return;
+    if (!map || hotspots.length === 0) return;
 
-    // Clear existing markers
+    // Clear existing circle markers
     map.eachLayer((layer) => {
       if (layer instanceof L.CircleMarker) map.removeLayer(layer);
     });
@@ -70,9 +76,11 @@ export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: H
         </div>
       `);
 
-      marker.on('click', () => onSelectHotspot?.(v));
+      marker.on('click', () => {
+        callbackRef.current?.(v);
+      });
     });
-  }, [hotspots, onSelectHotspot]);
+  }, [hotspots]);
 
   return (
     <div className={`rounded-2xl overflow-hidden border border-border/60 shadow-elevated ${className}`}>

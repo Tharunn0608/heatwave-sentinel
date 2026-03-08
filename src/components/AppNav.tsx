@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { MapPin, FileText, Camera, BarChart3, Shield, Menu, X, Zap, Moon, Sun } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_ITEMS = [
@@ -11,9 +11,32 @@ const NAV_ITEMS = [
   { path: '/admin', label: 'Admin', icon: Shield },
 ];
 
+function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const stored = localStorage.getItem('theme');
+    if (stored) return stored === 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (dark) {
+      root.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [dark]);
+
+  return [dark, () => setDark(d => !d)] as const;
+}
+
 export default function AppNav() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const [dark, toggleDark] = useDarkMode();
 
   return (
     <>
@@ -59,14 +82,35 @@ export default function AppNav() {
             ))}
           </div>
 
-          {/* Mobile toggle */}
-          <motion.button 
-            whileTap={{ scale: 0.9 }}
-            className="md:hidden p-2.5 rounded-xl hover:bg-muted transition-colors" 
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </motion.button>
+          {/* Right side: dark mode + mobile toggle */}
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.85, rotate: 180 }}
+              onClick={toggleDark}
+              className="p-2.5 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              aria-label="Toggle dark mode"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {dark ? (
+                  <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                    <Sun className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                    <Moon className="w-5 h-5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.button>
+
+            <motion.button 
+              whileTap={{ scale: 0.9 }}
+              className="md:hidden p-2.5 rounded-xl hover:bg-muted transition-colors" 
+              onClick={() => setOpen(!open)}
+            >
+              {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </motion.button>
+          </div>
         </div>
       </nav>
 
