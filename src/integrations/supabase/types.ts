@@ -130,6 +130,36 @@ export type Database = {
         }
         Relationships: []
       }
+      squad_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          squad_name: string
+          status: string
+          villages: string[]
+        }
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          squad_name: string
+          status?: string
+          villages?: string[]
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          squad_name?: string
+          status?: string
+          villages?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
