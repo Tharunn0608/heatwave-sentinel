@@ -72,6 +72,7 @@ export default function ReportPage() {
       risk_score: score,
       village_name: form.village || 'Unknown Village',
       status: score >= 0.7 ? 'active' : score >= 0.3 ? 'monitoring' : 'resolved',
+      photo_url: photo || '',
     }, {
       onSuccess: () => toast.success('Hotspot reported and saved to database!'),
       onError: () => toast.error('Failed to save. You may need to log in.'),
