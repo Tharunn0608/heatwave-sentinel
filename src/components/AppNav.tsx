@@ -36,8 +36,19 @@ function useDarkMode() {
 
 export default function AppNav() {
   const { pathname } = useLocation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [dark, toggleDark] = useDarkMode();
+
+  const handleAuth = async () => {
+    if (user) {
+      await signOut();
+      navigate('/auth');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <>
