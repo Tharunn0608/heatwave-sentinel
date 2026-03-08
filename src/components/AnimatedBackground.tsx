@@ -1,5 +1,5 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, forwardRef } from 'react';
 
 function FloatingParticle({ delay, size, x, y, color }: { delay: number; size: number; x: string; y: string; color: string }) {
   return (
@@ -30,7 +30,7 @@ function FloatingParticle({ delay, size, x, y, color }: { delay: number; size: n
   );
 }
 
-export default function AnimatedBackground() {
+const AnimatedBackground = forwardRef<HTMLDivElement>(function AnimatedBackground(_props, ref) {
   const [particles] = useState(() =>
     Array.from({ length: 25 }, (_, i) => ({
       id: i,
@@ -144,4 +144,6 @@ export default function AnimatedBackground() {
       />
     </div>
   );
-}
+});
+
+export default AnimatedBackground;
