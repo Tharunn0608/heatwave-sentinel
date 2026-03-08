@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, MapPin, AlertTriangle, Activity, Shield } from 'lucide-react';
+import { BarChart3, TrendingUp, MapPin, AlertTriangle, Activity, Shield, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts';
 import StatsCard from '@/components/StatsCard';
 import AnimatedBackground from '@/components/AnimatedBackground';
@@ -41,14 +41,32 @@ export default function DashboardPage() {
       <AnimatedBackground />
       <div className="container py-8 space-y-8">
         <motion.div initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring' }}>
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl gradient-primary glow">
-              <BarChart3 className="w-6 h-6 text-primary-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl gradient-primary glow">
+                <BarChart3 className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
+                <p className="text-sm text-muted-foreground font-medium">Hassan District Analytics</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight">Dashboard</h1>
-              <p className="text-sm text-muted-foreground font-medium">Hassan District Analytics</p>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                const csv = ['Village,Risk Score,Temp,Humidity,Rain,Stagnation,Status', ...hotspots.map(h => `${h.village_name},${(h.risk_score*100).toFixed(0)}%,${h.temp}°C,${h.humidity}%,${h.rain_mm}mm,${h.water_stagnation_days}d,${h.status}`)].join('\n');
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `heatwave-data-${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border/60 text-sm font-semibold hover:shadow-elevated transition-all"
+            >
+              <Download className="w-4 h-4 text-primary" />
+              Export CSV
+            </motion.button>
           </div>
         </motion.div>
 

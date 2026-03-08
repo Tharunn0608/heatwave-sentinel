@@ -6,12 +6,15 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AppNav from "@/components/AppNav";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AIChatWidget from "@/components/AIChatWidget";
+import AlertTicker from "@/components/AlertTicker";
 import HomePage from "./pages/HomePage";
 import ReportPage from "./pages/ReportPage";
 import ARPatrolPage from "./pages/ARPatrolPage";
 import DashboardPage from "./pages/DashboardPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
+import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,7 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <AppNav />
+          <AlertTicker />
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/" element={<HomePage />} />
@@ -31,8 +35,10 @@ const App = () => (
             <Route path="/ar-patrol" element={<ProtectedRoute><ARPatrolPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <AIChatWidget />
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
