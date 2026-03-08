@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { type Hotspot, getRiskColor, getRiskLabel } from '@/hooks/useHotspots';
-import { TUMKUR_CENTER } from '@/utils/mockData';
+import { HASSAN_CENTER } from '@/utils/mockData';
 
 interface HeatMapProps {
   hotspots: Hotspot[];
