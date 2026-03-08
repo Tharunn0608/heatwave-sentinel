@@ -6,11 +6,11 @@ import { useAuth } from '@/hooks/useAuth';
 
 const NAV_ITEMS = [
   { path: '/', label: 'Map', icon: MapPin },
+  { path: '/timeline', label: 'Timeline', icon: Zap },
   { path: '/report', label: 'Report', icon: FileText },
-  { path: '/ar-patrol', label: 'AR Patrol', icon: Camera },
   { path: '/dashboard', label: 'Dashboard', icon: BarChart3 },
   { path: '/admin', label: 'Admin', icon: Shield },
-  { path: '/about', label: 'About', icon: Zap },
+  { path: '/about', label: 'About', icon: Camera },
 ];
 
 function useDarkMode() {
