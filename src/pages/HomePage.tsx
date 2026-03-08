@@ -27,7 +27,7 @@ export default function HomePage() {
     : '0';
 
   return (
-    <div className="pt-18 pb-24 md:pb-6 min-h-screen">
+    <div className="pt-20 pb-24 md:pb-6 min-h-screen">
       <AnimatedBackground />
       <div className="container py-8 space-y-8">
         {/* Hero */}
