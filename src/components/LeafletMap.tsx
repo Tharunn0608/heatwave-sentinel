@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
-import { TUMKUR_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
+import { HASSAN_CENTER, VILLAGES, getRiskColor, getRiskLabel, type Hotspot } from '@/utils/mockData';
 import 'leaflet/dist/leaflet.css';
 import { useEffect } from 'react';
 
@@ -18,7 +18,7 @@ interface LeafletMapProps {
 export default function LeafletMap({ onSelectHotspot }: LeafletMapProps) {
   return (
     <MapContainer
-      center={TUMKUR_CENTER}
+      center={HASSAN_CENTER}
       zoom={10}
       scrollWheelZoom={true}
       style={{ height: '100%', minHeight: 400 }}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { type Hotspot, getRiskColor, getRiskLabel } from '@/hooks/useHotspots';
-import { TUMKUR_CENTER } from '@/utils/mockData';
+import { HASSAN_CENTER } from '@/utils/mockData';
 
 interface HeatMapProps {
   hotspots: Hotspot[];
@@ -24,7 +24,7 @@ export default function HeatMap({ hotspots, onSelectHotspot, className = '' }: H
     if (!mapRef.current || leafletMapRef.current) return;
 
     const map = L.map(mapRef.current, {
-      center: TUMKUR_CENTER,
+      center: HASSAN_CENTER,
       zoom: 10,
       zoomControl: true,
       scrollWheelZoom: true,

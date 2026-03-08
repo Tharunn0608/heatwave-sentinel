@@ -164,7 +164,7 @@ export default function AdminPage() {
             <Users className="w-5 h-5 text-primary" /> Spray Squad Assignments
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
-            {['Squad Alpha — Tumkūr City & Sira', 'Squad Beta — Pavagada & Madhugiri', 'Squad Gamma — Tiptur & Turuvekere'].map((squad, i) => (
+            {['Squad Alpha — Hassan City & Arsikere', 'Squad Beta — Belur & Halebidu', 'Squad Gamma — Channarayapatna & Holenarasipura'].map((squad, i) => (
               <motion.div 
                 key={i} 
                 whileHover={{ scale: 1.02, y: -2 }}
